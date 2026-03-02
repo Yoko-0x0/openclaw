@@ -51,6 +51,27 @@ import {
 import { resolveSlackRoomContextHints } from "../room-context.js";
 import type { PreparedSlackMessage } from "./types.js";
 
+const mentionRegexCache = new WeakMap<SlackMonitorContext, Map<string, RegExp[]>>();
+
+function resolveCachedMentionRegexes(
+  ctx: SlackMonitorContext,
+  agentId: string | undefined,
+): RegExp[] {
+  const key = agentId?.trim() || "__default__";
+  let byAgent = mentionRegexCache.get(ctx);
+  if (!byAgent) {
+    byAgent = new Map<string, RegExp[]>();
+    mentionRegexCache.set(ctx, byAgent);
+  }
+  const cached = byAgent.get(key);
+  if (cached) {
+    return cached;
+  }
+  const built = buildMentionRegexes(ctx.cfg, agentId);
+  byAgent.set(key, built);
+  return built;
+}
+
 export async function prepareSlackMessage(params: {
   ctx: SlackMonitorContext;
   account: ResolvedSlackAccount;
@@ -66,13 +87,17 @@ export async function prepareSlackMessage(params: {
     topic?: string;
     purpose?: string;
   } = {};
-  let channelType = message.channel_type;
-  if (!channelType || channelType !== "im") {
+  let resolvedChannelType = normalizeSlackChannelType(message.channel_type, message.channel);
+  // D-prefixed channels are always direct messages. Skip channel lookups in
+  // that common path to avoid an unnecessary API round-trip.
+  if (resolvedChannelType !== "im" && (!message.channel_type || message.channel_type !== "im")) {
     channelInfo = await ctx.resolveChannelName(message.channel);
-    channelType = channelType ?? channelInfo.type;
+    resolvedChannelType = normalizeSlackChannelType(
+      message.channel_type ?? channelInfo.type,
+      message.channel,
+    );
   }
   const channelName = channelInfo?.name;
-  const resolvedChannelType = normalizeSlackChannelType(channelType, message.channel);
   const isDirectMessage = resolvedChannelType === "im";
   const isGroupDm = resolvedChannelType === "mpim";
   const isRoom = resolvedChannelType === "channel" || resolvedChannelType === "group";
@@ -201,7 +226,7 @@ export async function prepareSlackMessage(params: {
   const historyKey =
     isThreadReply && ctx.threadHistoryScope === "thread" ? sessionKey : message.channel;
 
-  const mentionRegexes = buildMentionRegexes(cfg, route.agentId);
+  const mentionRegexes = resolveCachedMentionRegexes(ctx, route.agentId);
   const hasAnyMention = /<@[^>]+>/.test(message.text ?? "");
   const explicitlyMentioned = Boolean(
     ctx.botUserId && message.text?.includes(`<@${ctx.botUserId}>`),
