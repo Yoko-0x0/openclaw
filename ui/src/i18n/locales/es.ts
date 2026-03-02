@@ -71,8 +71,7 @@ export const es: TranslationMap = {
       uptime: "Tiempo de actividad",
       tickInterval: "Intervalo de tick",
       lastChannelsRefresh: "Última actualización de canales",
-      channelsHint:
-        "Usa Canales para vincular WhatsApp, Telegram, Discord, Signal o iMessage.",
+      channelsHint: "Usa Canales para vincular WhatsApp, Telegram, Discord, Signal o iMessage.",
     },
     stats: {
       instances: "Instancias",
@@ -231,15 +230,13 @@ export const es: TranslationMap = {
       wakeMode: "Modo de despertar",
       now: "Ahora",
       nextHeartbeat: "Próximo latido",
-      wakeModeHelp:
-        "Ahora se activa de inmediato. Próximo latido espera al siguiente ciclo.",
+      wakeModeHelp: "Ahora se activa de inmediato. Próximo latido espera al siguiente ciclo.",
       payloadKind: "¿Qué debe ejecutarse?",
       systemEvent: "Publicar mensaje en la línea de tiempo principal",
       agentTurn: "Ejecutar tarea del asistente (aislada)",
       systemEventHelp:
         "Envía tu texto a la línea de tiempo principal del gateway (ideal para recordatorios/activadores).",
-      agentTurnHelp:
-        "Inicia una ejecución del asistente en su propia sesión usando tu indicación.",
+      agentTurnHelp: "Inicia una ejecución del asistente en su propia sesión usando tu indicación.",
       timeoutSeconds: "Tiempo de espera (segundos)",
       timeoutPlaceholder: "Opcional, p. ej. 90",
       timeoutHelp:
@@ -278,8 +275,7 @@ export const es: TranslationMap = {
       seconds: "Segundos",
       model: "Modelo",
       modelPlaceholder: "openai/gpt-5.2",
-      modelHelp:
-        "Empieza a escribir para elegir un modelo conocido, o ingresa uno personalizado.",
+      modelHelp: "Empieza a escribir para elegir un modelo conocido, o ingresa uno personalizado.",
       thinking: "Pensamiento",
       thinkingPlaceholder: "low",
       thinkingHelp: "Usa un nivel sugerido o introduce un valor específico del proveedor.",
